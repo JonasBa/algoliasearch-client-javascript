@@ -2456,7 +2456,6 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
   console.log(requestOptions, initialOpts)
   console.log(this._getAppIdData());
   
-  debugger
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
   if(supportsNavigator) {

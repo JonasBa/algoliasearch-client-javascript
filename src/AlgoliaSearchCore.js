@@ -65,7 +65,7 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
   opts = opts || {};
 
   this._timeouts = opts.timeouts || {
-    connect: 1 * 1000, // 500ms connect is GPRS latency
+    connect: 1 * 1000,// 500ms connect is GPRS latency
     read: 2 * 1000,
     write: 30 * 1000
   };
@@ -436,10 +436,28 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
 
       return retryRequest();
     }
+    
+    function logTimeout(host, timeout) {
+      var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
+
+      if(supportsNavigator) {
+
+      }
+
+      client._request, {
+        url: initialOpts.url,
+        method: initialOpts.method,
+        body: body,
+        jsonBody: initialOpts.body,
+        timeouts: client._getTimeoutsForRequest(initialOpts.hostType),
+        forceAuthHeaders: initialOpts.forceAuthHeaders
+      }
+    }
 
     function retryRequest() {
       requestDebug('retrying request');
       client._incrementHostIndex(initialOpts.hostType);
+      logTimeout(reqOpts)
       return doRequest(requester, reqOpts);
     }
 
@@ -448,6 +466,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
       client._incrementHostIndex(initialOpts.hostType);
       client._incrementTimeoutMultipler();
       reqOpts.timeouts = client._getTimeoutsForRequest(initialOpts.hostType);
+      logTimeout(reqOpts)
       return doRequest(requester, reqOpts);
     }
   }

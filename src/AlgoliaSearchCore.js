@@ -156,6 +156,7 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
     completeTimeout: requestOptions.timeouts.complete
   }
   
+  
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
   if(supportsNavigator) {

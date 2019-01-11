@@ -2371,7 +2371,7 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
   opts = opts || {};
 
   this._timeouts = opts.timeouts || {
-    connect: 1 * 1000,// 500ms connect is GPRS latency
+    connect: 1 * 1000, // 500ms connect is GPRS latency
     read: 2 * 1000,
     write: 30 * 1000
   };
@@ -2451,6 +2451,25 @@ AlgoliaSearchCore.prototype.initIndex = function(indexName) {
 AlgoliaSearchCore.prototype.setExtraHeader = function(name, value) {
   this.extraHeaders[name.toLowerCase()] = value;
 };
+
+AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
+  console.log(requestOptions, initialOpts)
+  consoel.log(this._getAppIdData());
+  var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
+
+  if(supportsNavigator) {
+
+  }
+
+  // client._request, {
+  //   url: initialOpts.url,
+  //   method: initialOpts.method,
+  //   body: body,
+  //   jsonBody: initialOpts.body,
+  //   timeouts: client._getTimeoutsForRequest(initialOpts.hostType),
+  //   forceAuthHeaders: initialOpts.forceAuthHeaders
+  // }
+}
 
 /**
 * Get the value of an extra HTTP header
@@ -2561,6 +2580,8 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
       if (!hasFallback || usingFallback) {
         requestDebug('could not get any response');
         // then stop
+        // Client completely died
+        logTimeout(reqOpts, initialOpts)
         return client._promise.reject(new errors.AlgoliaSearchError(
           'Cannot connect to the AlgoliaSearch API.' +
           ' Send an email to support@algolia.com to report and resolve the issue.' +
@@ -2741,24 +2762,6 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
       }
 
       return retryRequest();
-    }
-    
-    function logTimeout(host, timeout) {
-      console.log(host, timeout)
-      var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
-
-      if(supportsNavigator) {
-
-      }
-
-      // client._request, {
-      //   url: initialOpts.url,
-      //   method: initialOpts.method,
-      //   body: body,
-      //   jsonBody: initialOpts.body,
-      //   timeouts: client._getTimeoutsForRequest(initialOpts.hostType),
-      //   forceAuthHeaders: initialOpts.forceAuthHeaders
-      // }
     }
 
     function retryRequest() {

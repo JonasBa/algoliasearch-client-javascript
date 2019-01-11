@@ -3990,7 +3990,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
     function retryRequest() {
       requestDebug('retrying request');
       client._incrementHostIndex(initialOpts.hostType);
-      logTimeout(reqOpts)
+      logTimeout(reqOpts, initialOpts)
       return doRequest(requester, reqOpts);
     }
 
@@ -3999,7 +3999,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
       client._incrementHostIndex(initialOpts.hostType);
       client._incrementTimeoutMultipler();
       reqOpts.timeouts = client._getTimeoutsForRequest(initialOpts.hostType);
-      logTimeout(reqOpts)
+      logTimeout(reqOpts, initialOpts)
       return doRequest(requester, reqOpts);
     }
   }

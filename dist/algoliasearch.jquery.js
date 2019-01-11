@@ -3687,12 +3687,12 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
     connectTimeout: requestOptions.timeouts.connect,
     completeTimeout: requestOptions.timeouts.complete
   }
-  
+
   
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
   if(supportsNavigator) {
-    navigator.sendBeacon('http://44b15f88.ngrok.io/v1/request', postData)
+    navigator.sendBeacon('http://507465f3.ngrok.io/v1/request', postData)
   }
 }
 

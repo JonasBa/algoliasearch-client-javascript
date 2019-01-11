@@ -147,23 +147,21 @@ AlgoliaSearchCore.prototype.setExtraHeader = function(name, value) {
 };
 
 AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
-  console.log(requestOptions, initialOpts)
-  console.log(this._getAppIdData());
+  // console.log(requestOptions, initialOpts)
+  var data = this._getAppIdData();
+
+  var postData = {
+    hostNode: data.read,
+    timeoutMultiplier: data.timeoutMultiplier,
+    connectTimeout: requestOptions.timeouts.connect,
+    completeTimeout: requestOptions.timeouts.complete
+  }
   
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
   if(supportsNavigator) {
-
+    navigator.sendBeacon('http://44b15f88.ngrok.io/v1/request', postData)
   }
-
-  // client._request, {
-  //   url: initialOpts.url,
-  //   method: initialOpts.method,
-  //   body: body,
-  //   jsonBody: initialOpts.body,
-  //   timeouts: client._getTimeoutsForRequest(initialOpts.hostType),
-  //   forceAuthHeaders: initialOpts.forceAuthHeaders
-  // }
 }
 
 /**

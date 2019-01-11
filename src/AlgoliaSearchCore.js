@@ -438,20 +438,21 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
     }
     
     function logTimeout(host, timeout) {
+      console.log(host, timeout)
       var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
       if(supportsNavigator) {
 
       }
 
-      client._request, {
-        url: initialOpts.url,
-        method: initialOpts.method,
-        body: body,
-        jsonBody: initialOpts.body,
-        timeouts: client._getTimeoutsForRequest(initialOpts.hostType),
-        forceAuthHeaders: initialOpts.forceAuthHeaders
-      }
+      // client._request, {
+      //   url: initialOpts.url,
+      //   method: initialOpts.method,
+      //   body: body,
+      //   jsonBody: initialOpts.body,
+      //   timeouts: client._getTimeoutsForRequest(initialOpts.hostType),
+      //   forceAuthHeaders: initialOpts.forceAuthHeaders
+      // }
     }
 
     function retryRequest() {

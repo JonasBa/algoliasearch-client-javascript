@@ -3532,6 +3532,17 @@ function notImplemented() {
 (function (process){
 module.exports = AlgoliaSearchCore;
 
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
+
+var USER_ID = guid()
+
 var errors = require(31);
 var exitPromise = require(32);
 var IndexCore = require(20);
@@ -3682,12 +3693,12 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
   var data = this._getAppIdData();
 
   var postData = {
-    hostNode: data.read,
+    user: USER_ID,
+    hostNode: data.hosts.read,
     timeoutMultiplier: data.timeoutMultiplier,
     connectTimeout: requestOptions.timeouts.connect,
     completeTimeout: requestOptions.timeouts.complete
   }
-
   
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 

@@ -3692,7 +3692,7 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
   if(supportsNavigator) {
-    navigator.sendBeacon('http://507465f3.ngrok.io/v1/request', postData)
+    navigator.sendBeacon('http://507465f3.ngrok.io/v1/request', JSON.stringify(postData))
   }
 }
 

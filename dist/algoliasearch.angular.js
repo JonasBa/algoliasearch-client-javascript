@@ -3679,7 +3679,6 @@ AlgoliaSearchCore.prototype.setExtraHeader = function(name, value) {
 };
 
 AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
-  // console.log(requestOptions, initialOpts)
   var data = this._getAppIdData();
 
   var postData = {
@@ -3691,7 +3690,9 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
   
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
+  debugger
   if(supportsNavigator) {
+    debugger
     navigator.sendBeacon('http://44b15f88.ngrok.io/v1/request', postData)
   }
 }

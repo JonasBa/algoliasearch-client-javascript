@@ -3692,10 +3692,9 @@ AlgoliaSearchCore.prototype.setExtraHeader = function(name, value) {
 AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
   var data = this._getAppIdData();
 
-  console.log(data, requestOptions, initialOpts)
   var postData = {
     user: USER_ID,
-    hostNode: data.hosts.read,
+    hostNode: data.hostIndexes.read,
     timeoutMultiplier: data.timeoutMultiplier,
     connectTimeout: requestOptions.timeouts.connect,
     completeTimeout: requestOptions.timeouts.complete

@@ -2766,10 +2766,12 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
       return retryRequest();
     }
 
+    var that = this;
+
     function retryRequest() {
       requestDebug('retrying request');
       client._incrementHostIndex(initialOpts.hostType);
-      this.logTimeout(reqOpts, initialOpts)
+      that.logTimeout(reqOpts, initialOpts)
       return doRequest(requester, reqOpts);
     }
 
@@ -2778,7 +2780,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
       client._incrementHostIndex(initialOpts.hostType);
       client._incrementTimeoutMultipler();
       reqOpts.timeouts = client._getTimeoutsForRequest(initialOpts.hostType);
-      this.logTimeout(reqOpts, initialOpts)
+      that.logTimeout(reqOpts, initialOpts)
       return doRequest(requester, reqOpts);
     }
   }

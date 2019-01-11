@@ -1,4 +1,4 @@
-/*! algoliasearch 3.32.0 | © 2014, 2015 Algolia SAS | github.com/algolia/algoliasearch-client-js */
+/*! algoliasearch UNRELEASED | © 2014, 2015 Algolia SAS | github.com/algolia/algoliasearch-client-js */
 (function(f){var g;if(typeof window!=='undefined'){g=window}else if(typeof self!=='undefined'){g=self}g.ALGOLIA_MIGRATION_LAYER=f()})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
 module.exports = function load (src, opts, cb) {
@@ -3508,7 +3508,7 @@ AlgoliaSearch.prototype.getPersonalizationStrategy = function(callback) {
   return this._jsonRequest({
     method: 'GET',
     url: '/1/recommendation/personalization/strategy',
-    hostType: 'write',
+    hostType: 'read',
     callback: callback
   });
 };
@@ -3597,7 +3597,7 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
   opts = opts || {};
 
   this._timeouts = opts.timeouts || {
-    connect: 1 * 1000, // 500ms connect is GPRS latency
+    connect: 1 * 1000,// 500ms connect is GPRS latency
     read: 2 * 1000,
     write: 30 * 1000
   };
@@ -3968,10 +3968,29 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
 
       return retryRequest();
     }
+    
+    function logTimeout(host, timeout) {
+      console.log(host, timeout)
+      var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
+
+      if(supportsNavigator) {
+
+      }
+
+      // client._request, {
+      //   url: initialOpts.url,
+      //   method: initialOpts.method,
+      //   body: body,
+      //   jsonBody: initialOpts.body,
+      //   timeouts: client._getTimeoutsForRequest(initialOpts.hostType),
+      //   forceAuthHeaders: initialOpts.forceAuthHeaders
+      // }
+    }
 
     function retryRequest() {
       requestDebug('retrying request');
       client._incrementHostIndex(initialOpts.hostType);
+      logTimeout(reqOpts)
       return doRequest(requester, reqOpts);
     }
 
@@ -3980,6 +3999,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
       client._incrementHostIndex(initialOpts.hostType);
       client._incrementTimeoutMultipler();
       reqOpts.timeouts = client._getTimeoutsForRequest(initialOpts.hostType);
+      logTimeout(reqOpts)
       return doRequest(requester, reqOpts);
     }
   }
@@ -7023,7 +7043,7 @@ module.exports = {
   ),
   RequestTimeout: createCustomError(
     'RequestTimeout',
-    'Request timedout before getting a response'
+    'Request timed out before getting a response'
   ),
   Network: createCustomError(
     'Network',

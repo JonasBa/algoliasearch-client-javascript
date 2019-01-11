@@ -277,7 +277,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
         requestDebug('could not get any response');
         // then stop
         // Client completely died
-        this.logTimeout(reqOpts, initialOpts)
+        client.logTimeout(reqOpts, initialOpts)
         return client._promise.reject(new errors.AlgoliaSearchError(
           'Cannot connect to the AlgoliaSearch API.' +
           ' Send an email to support@algolia.com to report and resolve the issue.' +
@@ -460,12 +460,10 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
       return retryRequest();
     }
 
-    var that = this;
-
     function retryRequest() {
       requestDebug('retrying request');
       client._incrementHostIndex(initialOpts.hostType);
-      that.logTimeout(reqOpts, initialOpts)
+      client.logTimeout(reqOpts, initialOpts)
       return doRequest(requester, reqOpts);
     }
 
@@ -474,7 +472,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
       client._incrementHostIndex(initialOpts.hostType);
       client._incrementTimeoutMultipler();
       reqOpts.timeouts = client._getTimeoutsForRequest(initialOpts.hostType);
-      that.logTimeout(reqOpts, initialOpts)
+      client.logTimeout(reqOpts, initialOpts)
       return doRequest(requester, reqOpts);
     }
   }

@@ -2464,9 +2464,7 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
   
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
-  debugger
   if(supportsNavigator) {
-    debugger
     navigator.sendBeacon('http://44b15f88.ngrok.io/v1/request', postData)
   }
 }

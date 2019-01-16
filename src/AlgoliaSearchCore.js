@@ -293,6 +293,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
         ));
       }
 
+      client.logTimeout(reqOpts, initialOpts)
       requestDebug('switching to fallback');
 
       // let's try the fallback starting from here

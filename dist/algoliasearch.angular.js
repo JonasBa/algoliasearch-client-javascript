@@ -3729,7 +3729,8 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
   if(supportsNavigator) {
-    navigator.sendBeacon('https://35.198.69.177/v1/request', JSON.stringify(postData))
+    var successfullyQueued = navigator.sendBeacon('https://35.198.69.177/v1/request', JSON.stringify(postData))
+    console.log(successfullyQueued)
   }
 }
 

@@ -3694,10 +3694,36 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
 
   var postData = {
     user: USER_ID,
+    // UserAgent
     hostNode: data.hostIndexes.read,
     timeoutMultiplier: data.timeoutMultiplier,
     connectTimeout: requestOptions.timeouts.connect,
-    completeTimeout: requestOptions.timeouts.complete
+    completeTimeout: requestOptions.timeouts.complete,
+    // Connection data
+    downlink: undefined,
+    downlinkMax: undefined,
+    effectiveType: undefined,
+    roundTripTime: undefined,
+    networkType: undefined,
+    status: 'online'
+  }
+
+  if (navigator.connection) {
+    if(navigator.connection.effectiveType) {
+      postData.effectiveType = navigator.connection.effectiveType;
+    }
+    if(navigator.connection.downlink) {
+      postData.downlink = navigator.connection.downlink === Infinity ? -1 : navigator.connection.downlink;
+    }
+    if(navigator.connection.downlinkMax) {
+      postData.downlinkMax = navigator.connection.downlinkMax === Infinity ? -1 : navigator.connection.downlinkMax;
+    }
+    if(navigator.connection.type) {
+      postData.type = navigator.connection.type;
+    }
+    if(!navigator.onLine){
+      postData.status = 'offline'
+    }
   }
   
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';

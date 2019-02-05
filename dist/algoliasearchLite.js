@@ -2439,9 +2439,24 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
   this._useFallback = opts.useFallback === undefined ? true : opts.useFallback;
 
   this._setTimeout = opts._setTimeout;
+  this.warmupConnection()
 
   debug('init done, %j', this);
 }
+
+/*
+ * Get the index object initialized
+ *
+ * @param indexName the name of index
+ * @param callback the result callback with one argument (the Index instance)
+ */
+AlgoliaSearchCore.prototype.warmupConnection = function() {
+  return this._jsonRequest({
+    method: 'GET',
+    url: '/1/isalive',
+    hostType: 'read'
+  });
+};
 
 /*
  * Get the index object initialized
@@ -2544,7 +2559,6 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
   this._checkAppIdData();
 
   var requestDebug = require(1)('algoliasearch:' + initialOpts.url);
-
 
   var body;
   var cacheID;

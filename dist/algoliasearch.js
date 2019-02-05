@@ -3665,7 +3665,7 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
   this._useFallback = opts.useFallback === undefined ? true : opts.useFallback;
 
   this._setTimeout = opts._setTimeout;
-  this.warmupConnection()
+  // this.warmupConnection()
 
   debug('init done, %j', this);
 }

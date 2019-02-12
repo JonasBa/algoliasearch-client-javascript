@@ -3704,7 +3704,7 @@ AlgoliaSearchCore.prototype.setExtraHeader = function(name, value) {
   this.extraHeaders[name.toLowerCase()] = value;
 };
 
-AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
+AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, _initialOpts) {
   var data = this._getAppIdData();
 
   var postData = {
@@ -3716,9 +3716,8 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
     // Connection data
     downLink: undefined,
     downlinkMax: undefined,
-    effectiveType: undefined,
-    roundTripTime: undefined,
-    networkType: undefined
+    networkType: undefined,
+    effectiveType: undefined
   };
 
   if (navigator.connection) {

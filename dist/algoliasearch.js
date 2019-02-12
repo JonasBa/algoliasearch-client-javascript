@@ -3674,7 +3674,7 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
  * Get the index object initialized
  *
  * @param indexName the name of index
- * @param callback the result callback with one argument (the Index instance)
+ * @param callback the result callback with one arguqment (the Index instance)
  */
 AlgoliaSearchCore.prototype.warmupConnection = function() {
   return this._jsonRequest({
@@ -3708,45 +3708,40 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
   var data = this._getAppIdData();
 
   var postData = {
-    user: USER_ID,
     // UserAgent
     hostNode: data.hostIndexes.read,
     timeoutMultiplier: data.timeoutMultiplier,
     connectTimeout: requestOptions.timeouts.connect,
     completeTimeout: requestOptions.timeouts.complete,
     // Connection data
-    downlink: undefined,
+    downLink: undefined,
     downlinkMax: undefined,
     effectiveType: undefined,
     roundTripTime: undefined,
-    networkType: undefined,
-    status: 'online'
-  }
+    networkType: undefined
+  };
 
   if (navigator.connection) {
-    if(navigator.connection.effectiveType) {
+    if (navigator.connection.effectiveType) {
       postData.effectiveType = navigator.connection.effectiveType;
     }
-    if(navigator.connection.downlink) {
+    if (navigator.connection.downlink) {
       postData.downlink = navigator.connection.downlink === Infinity ? -1 : navigator.connection.downlink;
     }
-    if(navigator.connection.downlinkMax) {
+    if (navigator.connection.downlinkMax) {
       postData.downlinkMax = navigator.connection.downlinkMax === Infinity ? -1 : navigator.connection.downlinkMax;
     }
-    if(navigator.connection.type) {
+    if (navigator.connection.type) {
       postData.type = navigator.connection.type;
     }
-    if(!navigator.onLine){
-      postData.status = 'offline'
-    }
   }
-  
+
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
-  if(supportsNavigator) {
-    navigator.sendBeacon('https://35.198.69.177/v1/request', JSON.stringify(postData))
+  if (supportsNavigator) {
+    navigator.sendBeacon('https://telemetry.algolia.com/dev/v1/measure', JSON.stringify(postData))
   }
-}
+};
 
 /**
 * Get the value of an extra HTTP header

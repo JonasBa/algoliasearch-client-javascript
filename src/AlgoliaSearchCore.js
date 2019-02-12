@@ -176,19 +176,17 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
   var data = this._getAppIdData();
 
   var postData = {
-    user: USER_ID,
     // UserAgent
     hostNode: data.hostIndexes.read,
     timeoutMultiplier: data.timeoutMultiplier,
     connectTimeout: requestOptions.timeouts.connect,
     completeTimeout: requestOptions.timeouts.complete,
     // Connection data
-    downlink: undefined,
+    downLink: undefined,
     downlinkMax: undefined,
     effectiveType: undefined,
     roundTripTime: undefined,
-    networkType: undefined,
-    status: 'online'
+    networkType: undefined
   };
 
   if (navigator.connection) {
@@ -204,15 +202,12 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, initialOpts) {
     if (navigator.connection.type) {
       postData.type = navigator.connection.type;
     }
-    if (!navigator.onLine) {
-      postData.status = 'offline';
-    }
   }
 
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
   if (supportsNavigator) {
-    navigator.sendBeacon('https://35.198.69.177/v1/request', JSON.stringify(postData))
+    navigator.sendBeacon('https://telemetry.algolia.com/dev/v1/measure', JSON.stringify(postData))
   }
 };
 

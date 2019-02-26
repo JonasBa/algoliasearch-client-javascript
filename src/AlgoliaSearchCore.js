@@ -1,16 +1,5 @@
 module.exports = AlgoliaSearchCore;
 
-function guid() {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-}
-
-var USER_ID = guid()
-
 var errors = require('./errors');
 var exitPromise = require('./exitPromise.js');
 var IndexCore = require('./IndexCore.js');
@@ -48,6 +37,9 @@ var RESET_APP_DATA_TIMER =
  *           ]) - The hosts to use for Algolia Search API.
  *           If you provide them, you will less benefit from our HA implementation
  */
+
+var hasConnectionAPI = window.navigator.connection !== undefined;
+
 function AlgoliaSearchCore(applicationID, apiKey, opts) {
   var debug = require('debug')('algoliasearch');
 
@@ -74,12 +66,6 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
   };
 
   opts = opts || {};
-
-  this._timeouts = opts.timeouts || {
-    connect: 1 * 1000, // 500ms connect is GPRS latency
-    read: 2 * 1000,
-    write: 30 * 1000
-  };
 
   // backward compat, if opts.timeout is passed, we use it to configure all timeouts like before
   if (opts.timeout) {
@@ -133,7 +119,25 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
   this._useFallback = opts.useFallback === undefined ? true : opts.useFallback;
 
   this._setTimeout = opts._setTimeout;
-  // this.warmupConnection()
+
+  var connection = window.navigator.connection;
+
+  this._timeoutMultiplier = 1.5;
+
+
+  if (hasConnectionAPI) {
+    var minValue = Math.max(connection.rtt, 100);
+
+    this._timeouts = {
+      connect: minValue * this._timeoutMultiplier,
+      read: minValue * this._timeoutMultiplier,
+      write: 30 * 1000
+    };
+  } else {
+    this.computeTimeoutStrategy();
+  }
+
+  window._timeouts = this._timeouts;
 
   debug('init done, %j', this);
 }
@@ -144,12 +148,70 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
  * @param indexName the name of index
  * @param callback the result callback with one arguqment (the Index instance)
  */
+
+AlgoliaSearchCore.prototype.computeTimeoutStrategy = function() {
+  var that = this;
+  this.setNaiveDefaultTimeouts();
+  this.warmupConnection().then(function() {
+    that.setupTimeoutTimeFromResources();
+  });
+};
+
+AlgoliaSearchCore.prototype.setNaiveDefaultTimeouts = function() {
+  this._timeouts = {
+    connect: 1 * 1000, // 500ms connect is GPRS latency
+    read: 2 * 1000,
+    write: 30 * 1000
+  };
+};
+
 AlgoliaSearchCore.prototype.warmupConnection = function() {
   return this._jsonRequest({
     method: 'GET',
     url: '/1/isalive',
     hostType: 'read'
   });
+};
+
+AlgoliaSearchCore.prototype.setupTimeoutTimeFromResources = function() {
+  if (typeof window.performance === undefined) {
+    return this.setNaiveDefaultTimeouts();
+  }
+
+  var resources = performance.getEntriesByType('resource');
+
+  if (resources === undefined || resources.length <= 0) {
+    return this.setNaiveDefaultTimeouts();
+  }
+
+  var lastAlgoliaRequest = resources.reverse().find(function(resource) {
+    return resource.initiatorType === 'xmlhttprequest' && resource.name.includes('isalive?x-algolia-agent=');
+  });
+
+  // var redirectTime = Math.round(lastAlgoliaRequest.redirectEnd - lastAlgoliaRequest.redirectStart);
+  // var dnsTime = Math.round(lastAlgoliaRequest.domainLookupEnd - lastAlgoliaRequest.domainLookupStart);
+  // var TCPTime = Math.round(lastAlgoliaRequest.connectEnd - lastAlgoliaRequest.connectStart);
+  // var TLS = Math.round(lastAlgoliaRequest.secureConnectionStart > 0 ? (lastAlgoliaRequest.connectEnd - lastAlgoliaRequest.secureConnectionStart) : 0);
+  // var responseTime = Math.round(lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.responseStart);
+  // var fetchTillResponseEnd = Math.round((lastAlgoliaRequest.fetchStart > 0) ? (lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.fetchStart) : 0);
+  // var requestStartTillResponseEnd = Math.round((lastAlgoliaRequest.requestStart > 0) ? (lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.requestStart) : 0);
+  var startToEnd = Math.round((lastAlgoliaRequest.startTime > 0) ? (lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.startTime) : 0);
+  // var decodedBodySize = lastAlgoliaRequest.decodedBodySize;
+  // var encodedBodySize = lastAlgoliaRequest.encodedBodySize;
+  // var transferSize = lastAlgoliaRequest.transferSize;
+  var minValue = Math.max(startToEnd, 100);
+
+  this._timeouts = {
+    connect: minValue * this._timeoutMultiplier,
+    read: minValue * this._timeoutMultiplier,
+    write: 30 * startToEnd * this._timeoutMultiplier
+  };
+
+  window._timeouts = this._timeouts;
+};
+
+AlgoliaSearchCore.prototype.checkForSlowNetwork = function() {
+  this.slowNetwork = this._timeouts.connect > 1000;
 };
 
 /*
@@ -172,7 +234,7 @@ AlgoliaSearchCore.prototype.setExtraHeader = function(name, value) {
   this.extraHeaders[name.toLowerCase()] = value;
 };
 
-AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, _initialOpts) {
+AlgoliaSearchCore.prototype.logTimeout = function(requestOptions) {
   var data = this._getAppIdData();
 
   var postData = {
@@ -206,7 +268,7 @@ AlgoliaSearchCore.prototype.logTimeout = function(requestOptions, _initialOpts) 
   var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
 
   if (supportsNavigator) {
-    navigator.sendBeacon('https://telemetry.algolia.com/dev/v1/measure', JSON.stringify(postData))
+    navigator.sendBeacon('https://telemetry.algolia.com/dev/v1/measure', JSON.stringify(postData));
   }
 };
 
@@ -319,7 +381,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
         requestDebug('could not get any response');
         // then stop
         // Client completely died
-        client.logTimeout(reqOpts, initialOpts)
+        client.logTimeout(reqOpts, initialOpts);
         return client._promise.reject(new errors.AlgoliaSearchError(
           'Cannot connect to the AlgoliaSearch API.' +
           ' Send an email to support@algolia.com to report and resolve the issue.' +
@@ -327,7 +389,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
         ));
       }
 
-      client.logTimeout(reqOpts, initialOpts)
+      client.logTimeout(reqOpts, initialOpts);
       requestDebug('switching to fallback');
 
       // let's try the fallback starting from here
@@ -506,7 +568,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
     function retryRequest() {
       requestDebug('retrying request');
       client._incrementHostIndex(initialOpts.hostType);
-      client.logTimeout(reqOpts, initialOpts)
+      client.logTimeout(reqOpts, initialOpts);
       return doRequest(requester, reqOpts);
     }
 
@@ -515,7 +577,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
       client._incrementHostIndex(initialOpts.hostType);
       client._incrementTimeoutMultipler();
       reqOpts.timeouts = client._getTimeoutsForRequest(initialOpts.hostType);
-      client.logTimeout(reqOpts, initialOpts)
+      client.logTimeout(reqOpts, initialOpts);
       return doRequest(requester, reqOpts);
     }
   }
@@ -906,7 +968,7 @@ AlgoliaSearchCore.prototype._checkAppIdData = function() {
 AlgoliaSearchCore.prototype._resetInitialAppIdData = function(data) {
   var newData = data || {};
   newData.hostIndexes = {read: 0, write: 0};
-  newData.timeoutMultiplier = 1;
+  newData.timeoutMultiplier = 1.5;
   newData.shuffleResult = newData.shuffleResult || shuffle([1, 2, 3]);
   return this._setAppIdData(newData);
 };

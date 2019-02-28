@@ -134,7 +134,7 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
     this.computeTimeoutStrategy();
   }
 
-  window._timeouts = this._timeouts;
+  this.checkForSlowNetwork();
 
   debug('init done, %j', this);
 }
@@ -234,7 +234,9 @@ AlgoliaSearchCore.prototype.setTimeoutsFromNetwork = function(connectionTime) {
 };
 
 AlgoliaSearchCore.prototype.checkForSlowNetwork = function() {
-  return this._getTimeoutsForRequest().connect > 1000;
+  var isConsideredSlowNetwork = this._getTimeoutsForRequest().connect > 1000;
+  this.isSlowNetwork = isConsideredSlowNetwork;
+  return this.isSlowNetwork;
 };
 
 /*
@@ -369,7 +371,6 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
   requestDebug('request start');
   var debugData = [];
 
-
   function doRequest(requester, reqOpts) {
     client._checkAppIdData();
 
@@ -456,6 +457,8 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
     if (requester === client._request.fallback) {
       requestDebug('using fallback');
     }
+
+    client.checkForSlowNetwork();
 
     // `requester` is any of this._request or this._request.fallback
     // thus it needs to be called using the client as context

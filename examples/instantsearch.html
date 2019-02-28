@@ -26,6 +26,7 @@
     </section>
 
     <h1>Results</h1>
+    <div id="slow">You are on a slow network, this might take a while.</div>
     <div id="hits"></div>
 
     <script type="text/javascript">
@@ -54,6 +55,8 @@
           return;
         }
 
+        $('#slow').hide()
+
         // Scan all hits and display them
         var html = '';
         for (var i = 0; i < content.hits.length; ++i) {
@@ -79,7 +82,17 @@
         // Replace the following value by the name of the index you want to query.
         var index = client.initIndex('contacts');
 
+        index.search(undefined, searchCallback)
+
+        if(client.checkForSlowNetwork()){
+          $('#slow').show()
+        }
+
         $inputfield.keyup(function() {
+          if(client.checkForSlowNetwork()) {
+            $('#slow').show()
+          }
+
           index.search($inputfield.val(), searchCallback);
         }).focus().closest('form').on('submit', function() {
           // on form submit, store the query string in the anchor

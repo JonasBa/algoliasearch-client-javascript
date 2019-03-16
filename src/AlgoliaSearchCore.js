@@ -134,8 +134,6 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
     this.computeTimeoutStrategy();
   }
 
-  this.checkForSlowNetwork();
-
   debug('init done, %j', this);
 }
 
@@ -162,6 +160,7 @@ AlgoliaSearchCore.prototype.setNaiveDefaultTimeouts = function() {
     read: 2 * 1000,
     write: 30 * 1000
   };
+  this.checkForSlowNetwork();
 };
 
 AlgoliaSearchCore.prototype.warmupConnection = function() {
@@ -235,6 +234,7 @@ AlgoliaSearchCore.prototype.setTimeoutsFromNetwork = function(roundTripTime) {
 
   console.log('Timeouts are set to: ', this._timeouts);
   window._timeouts = this._timeouts;
+  this.checkForSlowNetwork();
 };
 
 AlgoliaSearchCore.prototype.checkForSlowNetwork = function() {

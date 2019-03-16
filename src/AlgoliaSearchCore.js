@@ -207,6 +207,8 @@ AlgoliaSearchCore.prototype.setupTimeoutTimeFromResources = function() {
     return resource.initiatorType === 'xmlhttprequest' && resource.name.includes('isalive?x-algolia-agent=');
   });
 
+  if (!lastAlgoliaRequest) return this.setNaiveDefaultTimeouts();
+
   // var redirectTime = Math.round(lastAlgoliaRequest.redirectEnd - lastAlgoliaRequest.redirectStart);
   // var dnsTime = Math.round(lastAlgoliaRequest.domainLookupEnd - lastAlgoliaRequest.domainLookupStart);
   // var TCPTime = Math.round(lastAlgoliaRequest.connectEnd - lastAlgoliaRequest.connectStart);

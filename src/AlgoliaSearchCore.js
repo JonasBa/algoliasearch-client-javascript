@@ -193,7 +193,7 @@ AlgoliaSearchCore.prototype.setTimeoutsFromNavigation = function() {
 };
 
 AlgoliaSearchCore.prototype.setupTimeoutTimeFromResources = function() {
-  if (typeof window.performance === undefined) {
+  if (typeof window.performance === 'undefined') {
     return this.setNaiveDefaultTimeouts();
   }
 

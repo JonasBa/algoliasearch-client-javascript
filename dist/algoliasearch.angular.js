@@ -3657,6 +3657,7 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
   this._timeoutMultiplier = 1.5;
 
   if (hasConnectionAPI) {
+    alert('has connection API')
     var that = this;
     this.setTimeoutsFromNetwork(connection.rtt);
     connection.onchange = function() {
@@ -3681,7 +3682,9 @@ AlgoliaSearchCore.prototype.computeTimeoutStrategy = function() {
 
   if (this.setTimeoutsFromNavigation()) return false;
 
+  alert('fire warmup connection');
   this.warmupConnection().then(function() {
+    alert('setupTimeoutFromFromResources');
     that.setupTimeoutTimeFromResources();
   });
 };
@@ -3765,6 +3768,8 @@ AlgoliaSearchCore.prototype.setTimeoutsFromNetwork = function(roundTripTime) {
   };
 
   console.log('Timeouts are set to: ', this._timeouts);
+  alert('timeout is set to', minValue);
+
   window._timeouts = this._timeouts;
   this.checkForSlowNetwork();
 };

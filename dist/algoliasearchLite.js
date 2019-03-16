@@ -2432,9 +2432,9 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
 
   if (hasConnectionAPI) {
     var that = this;
-    this.setTimeoutsFromNetwork(Math.max(connection.rtt, 500));
+    this.setTimeoutsFromNetwork(connection.rtt);
     connection.onchange = function() {
-      that.setTimeoutsFromNetwork(Math.max(connection.rtt, 500));
+      that.setTimeoutsFromNetwork(connection.rtt);
     };
   } else {
     this.computeTimeoutStrategy();
@@ -2479,7 +2479,7 @@ AlgoliaSearchCore.prototype.warmupConnection = function() {
 };
 
 AlgoliaSearchCore.prototype.setTimeoutsFromNavigation = function() {
-  if (typeof window.performance === undefined) return false;
+  if (typeof window.performance === 'undefined') return false;
 
   var navigationResources = performance.getEntriesByType('navigation');
 
@@ -2489,6 +2489,8 @@ AlgoliaSearchCore.prototype.setTimeoutsFromNavigation = function() {
   }
 
   var lastAlgoliaRequest = navigationResources.reverse()[0];
+
+  if (!lastAlgoliaRequest) return false;
 
   var startToEnd = Math.round((lastAlgoliaRequest.startTime > 0) ? (lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.startTime) : 0);
   this.setTimeoutsFromNetwork(startToEnd);
@@ -2526,13 +2528,13 @@ AlgoliaSearchCore.prototype.setupTimeoutTimeFromResources = function() {
   this.setTimeoutsFromNetwork(startToEnd);
 };
 
-AlgoliaSearchCore.prototype.setTimeoutsFromNetwork = function(connectionTime) {
-  var minValue = Math.max(connectionTime, 100);
+AlgoliaSearchCore.prototype.setTimeoutsFromNetwork = function(roundTripTime) {
+  var minValue = Math.max(roundTripTime, 500);
 
   this._timeouts = {
     connect: minValue,
     read: minValue,
-    write: 30 * connectionTime
+    write: 30 * roundTripTime
   };
 
   console.log('Timeouts are set to: ', this._timeouts);

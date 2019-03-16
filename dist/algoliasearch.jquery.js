@@ -3570,8 +3570,6 @@ var RESET_APP_DATA_TIMER =
  *           If you provide them, you will less benefit from our HA implementation
  */
 
-var hasConnectionAPI = window.navigator.connection !== undefined;
-
 function AlgoliaSearchCore(applicationID, apiKey, opts) {
   var debug = require(1)('algoliasearch');
 
@@ -3656,10 +3654,10 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
 
   this._timeoutMultiplier = 1.5;
 
-  if (hasConnectionAPI) {
-    alert('has connection API')
+  if (connection && connection.rtt) {
     var that = this;
     this.setTimeoutsFromNetwork(connection.rtt);
+
     connection.onchange = function() {
       that.setTimeoutsFromNetwork(connection.rtt);
     };
@@ -3682,23 +3680,23 @@ AlgoliaSearchCore.prototype.computeTimeoutStrategy = function() {
 
   if (this.setTimeoutsFromNavigation()) return false;
 
-  alert('fire warmup connection');
   this.warmupConnection().then(function() {
-    alert('setupTimeoutFromFromResources');
     that.setupTimeoutTimeFromResources();
   });
 };
 
 AlgoliaSearchCore.prototype.setNaiveDefaultTimeouts = function() {
   this._timeouts = {
-    connect: 1 * 1000, // 500ms connect is GPRS latency
-    read: 2 * 1000,
+    connect: 1 * 500,
+    read: 1 * 500,
     write: 30 * 1000
   };
   this.checkForSlowNetwork();
 };
 
 AlgoliaSearchCore.prototype.warmupConnection = function() {
+  this.setNaiveDefaultTimeouts();
+
   return this._jsonRequest({
     method: 'GET',
     url: '/1/isalive',
@@ -3710,14 +3708,9 @@ AlgoliaSearchCore.prototype.setTimeoutsFromNavigation = function() {
   if (typeof window.performance === 'undefined') return false;
 
   var navigationResources = performance.getEntriesByType('navigation');
-
-  if (!navigationResources.length) {
-    this.setNaiveDefaultTimeouts();
-    return false;
-  }
+  if (!navigationResources.length) return false;
 
   var lastAlgoliaRequest = navigationResources.reverse()[0];
-
   if (!lastAlgoliaRequest) return false;
 
   var startToEnd = Math.round((lastAlgoliaRequest.startTime > 0) ? (lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.startTime) : 0);
@@ -3749,7 +3742,7 @@ AlgoliaSearchCore.prototype.setupTimeoutTimeFromResources = function() {
   // var TLS = Math.round(lastAlgoliaRequest.secureConnectionStart > 0 ? (lastAlgoliaRequest.connectEnd - lastAlgoliaRequest.secureConnectionStart) : 0);
   // var responseTime = Math.round(lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.responseStart);
   // var fetchTillResponseEnd = Math.round((lastAlgoliaRequest.fetchStart > 0) ? (lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.fetchStart) : 0);
-  // var requestStartTillResponseEnd = Math.round((lastAlgoliaRequest.requestStart > 0) ? (lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.requestStart) : 0);
+  // var requestStartTillResponseEnd = Math.round((lastAlgoliaRwequest.requestStart > 0) ? (lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.requestStart) : 0);
   var startToEnd = Math.round((lastAlgoliaRequest.startTime > 0) ? (lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.startTime) : 0);
   // var decodedBodySize = lastAlgoliaRequest.decodedBodySize;
   // var encodedBodySize = lastAlgoliaRequest.encodedBodySize;
@@ -3768,7 +3761,6 @@ AlgoliaSearchCore.prototype.setTimeoutsFromNetwork = function(roundTripTime) {
   };
 
   console.log('Timeouts are set to: ', this._timeouts);
-  alert('timeout is set to', minValue);
 
   window._timeouts = this._timeouts;
   this.checkForSlowNetwork();

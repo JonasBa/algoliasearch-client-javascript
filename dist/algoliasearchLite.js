@@ -2428,7 +2428,7 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
 
   this._timeoutMultiplier = 1.5;
 
-  if (connection && connection.rtt) {
+  if (connection && typeof connection.rtt === 'number') {
     var that = this;
     this.setTimeoutsFromNetwork(connection.rtt);
 

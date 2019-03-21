@@ -4134,7 +4134,7 @@ AlgoliaSearchCore.prototype._jsonRequest = function(initialOpts) {
     function retryRequestWithHigherTimeout() {
       requestDebug('retrying request with higher timeout');
       client._incrementHostIndex(initialOpts.hostType);
-      client._incrementTimeoutMultipler();
+      client._incrementTimeoutMultiplier();
       reqOpts.timeouts = client._getTimeoutsForRequest(initialOpts.hostType);
       client.logTimeout(reqOpts, initialOpts);
       return doRequest(requester, reqOpts);
@@ -4574,7 +4574,7 @@ AlgoliaSearchCore.prototype._incrementHostIndex = function(hostType) {
   );
 };
 
-AlgoliaSearchCore.prototype._incrementTimeoutMultipler = function() {
+AlgoliaSearchCore.prototype._incrementTimeoutMultiplier = function() {
   this._timeoutMultiplier = this._timeoutMultiplier * this._timeoutMultiplier;
   return this._partialAppIdDataUpdate({timeoutMultiplier: this._timeoutMultiplier});
 };

@@ -177,7 +177,7 @@ AlgoliaSearchCore.prototype.supportsPerformance = function() {
 };
 
 AlgoliaSearchCore.prototype.setTimeoutsFromNavigation = function() {
-  if (this.supportsPerformance()) return false;
+  if (!this.supportsPerformance()) return false;
 
   var navigationResources = performance.getEntriesByType('navigation');
   if (!navigationResources.length) return false;
@@ -192,7 +192,7 @@ AlgoliaSearchCore.prototype.setTimeoutsFromNavigation = function() {
 };
 
 AlgoliaSearchCore.prototype.setupTimeoutTimeFromResources = function() {
-  if (this.supportsPerformance()) {
+  if (!this.supportsPerformance()) {
     return this.setNaiveDefaultTimeouts();
   }
 

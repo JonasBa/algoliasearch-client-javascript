@@ -3704,8 +3704,12 @@ AlgoliaSearchCore.prototype.warmupConnection = function() {
   });
 };
 
+AlgoliaSearchCore.prototype.supportsPerformance = function() {
+  return typeof window.performance === 'object' && typeof window.performance.getEntriesByType === 'function';
+};
+
 AlgoliaSearchCore.prototype.setTimeoutsFromNavigation = function() {
-  if (typeof window.performance === 'undefined') return false;
+  if (!this.supportsPerformance()) return false;
 
   var navigationResources = performance.getEntriesByType('navigation');
   if (!navigationResources.length) return false;
@@ -3720,7 +3724,7 @@ AlgoliaSearchCore.prototype.setTimeoutsFromNavigation = function() {
 };
 
 AlgoliaSearchCore.prototype.setupTimeoutTimeFromResources = function() {
-  if (typeof window.performance === 'undefined') {
+  if (!this.supportsPerformance()) {
     return this.setNaiveDefaultTimeouts();
   }
 

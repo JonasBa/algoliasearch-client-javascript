@@ -2571,40 +2571,9 @@ AlgoliaSearchCore.prototype.setExtraHeader = function(name, value) {
 };
 
 AlgoliaSearchCore.prototype.logTimeout = function(requestOptions) {
-  var data = this._getAppIdData();
-
-  var postData = {
-    // UserAgent
-    hostNode: data.hostIndexes.read,
-    timeoutMultiplier: data.timeoutMultiplier,
-    connectTimeout: requestOptions.timeouts.connect,
-    completeTimeout: requestOptions.timeouts.complete,
-    // Connection data
-    downLink: undefined,
-    downlinkMax: undefined,
-    networkType: undefined,
-    effectiveType: undefined
-  };
-
-  if (navigator.connection) {
-    if (navigator.connection.effectiveType) {
-      postData.effectiveType = navigator.connection.effectiveType;
-    }
-    if (navigator.connection.downlink) {
-      postData.downlink = navigator.connection.downlink === Infinity ? -1 : navigator.connection.downlink;
-    }
-    if (navigator.connection.downlinkMax) {
-      postData.downlinkMax = navigator.connection.downlinkMax === Infinity ? -1 : navigator.connection.downlinkMax;
-    }
-    if (navigator.connection.type) {
-      postData.type = navigator.connection.type;
-    }
-  }
-
-  var supportsNavigator = navigator && typeof navigator.sendBeacon === 'function';
-
-  if (supportsNavigator) {
-    navigator.sendBeacon('https://telemetry.algolia.com/dev/v1/measure', JSON.stringify(postData));
+  if (typeof window.reportTimeout === 'function') {
+    var data = this._getAppIdData();
+    window.reportTimeout(data, requestOptions);
   }
 };
 

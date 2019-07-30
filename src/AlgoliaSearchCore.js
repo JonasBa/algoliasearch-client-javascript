@@ -126,9 +126,9 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
     var that = this;
     this.setTimeoutsFromNetwork(connection.rtt);
 
-    connection.onchange = function() {
+    connection.addEventListener('change', function() {
       that.setTimeoutsFromNetwork(connection.rtt);
-    };
+    });
   } else {
     this.computeTimeoutStrategy();
   }

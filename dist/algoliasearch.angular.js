@@ -3658,12 +3658,10 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
   this._useFallback = opts.useFallback === undefined ? true : opts.useFallback;
 
   this._setTimeout = opts._setTimeout;
-
-  var connection = window.navigator.connection;
-
   this._timeoutMultiplier = 1;
 
   this.setNaiveDefaultTimeouts();
+  // var connection = window.navigator.connection;
   // if (connection && typeof connection.rtt === 'number') {
   //   var that = this;
   //   this.setTimeoutsFromNetwork(connection.rtt);
@@ -4553,7 +4551,7 @@ AlgoliaSearchCore.prototype._checkAppIdData = function() {
   var data = this._getAppIdData();
   var now = new Date().getTime();
   if (data.timeoutMultiplier > 4) {
-    data.timeoutMultiplier = Math.max(data.timeoutMultiplier, 4);
+    data.timeoutMultiplier = 4;
   }
 
   if (data.timeoutMultiplier === 0) {

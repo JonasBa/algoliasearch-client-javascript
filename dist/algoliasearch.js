@@ -3661,7 +3661,7 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
 
   var connection = window.navigator.connection;
 
-  this._timeoutMultiplier = 1.5;
+  this._timeoutMultiplier = 1;
 
   this.setNaiveDefaultTimeouts();
   // if (connection && typeof connection.rtt === 'number') {
@@ -4552,7 +4552,11 @@ AlgoliaSearchCore.prototype._setAppIdData = function(data) {
 AlgoliaSearchCore.prototype._checkAppIdData = function() {
   var data = this._getAppIdData();
   var now = new Date().getTime();
-  if (data === null || now - data.lastChange > RESET_APP_DATA_TIMER) {
+  if (
+    data === null ||
+    now - data.lastChange > RESET_APP_DATA_TIMER ||
+    data.timeoutMultiplier === 0
+  ) {
     return this._resetInitialAppIdData(data);
   }
 

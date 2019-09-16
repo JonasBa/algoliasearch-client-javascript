@@ -3326,7 +3326,9 @@ AlgoliaSearchCore.prototype._setAppIdData = function(data) {
 AlgoliaSearchCore.prototype._checkAppIdData = function() {
   var data = this._getAppIdData();
   var now = new Date().getTime();
-  data.timeoutMultiplier = Math.max(data.timeoutMultiplier, 4);
+  if (data.timeoutMultiplier > 4) {
+    data.timeoutMultiplier = Math.max(data.timeoutMultiplier, 4);
+  }
 
   if (data.timeoutMultiplier === 0) {
     data.timeoutMultiplier = 1;

@@ -3326,11 +3326,14 @@ AlgoliaSearchCore.prototype._setAppIdData = function(data) {
 AlgoliaSearchCore.prototype._checkAppIdData = function() {
   var data = this._getAppIdData();
   var now = new Date().getTime();
-  if (
-    data === null ||
-    now - data.lastChange > RESET_APP_DATA_TIMER ||
-    data.timeoutMultiplier === 0
-  ) {
+  data.timeoutMultiplier = Math.max(data.timeoutMultiplier, 4);
+
+  if (data.timeoutMultiplier === 0) {
+    data.timeoutMultiplier = 1;
+    return this._resetInitialAppIdData(data);
+  }
+
+  if (data === null || now - data.lastChange > RESET_APP_DATA_TIMER) {
     return this._resetInitialAppIdData(data);
   }
 

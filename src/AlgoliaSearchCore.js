@@ -1079,7 +1079,7 @@ AlgoliaSearchCore.prototype._incrementHostIndex = function(hostType) {
 };
 
 AlgoliaSearchCore.prototype._incrementTimeoutMultiplier = function() {
-  var timeoutMultiplier = Math.max(this._timeoutMultiplier + 1, 4);
+  var timeoutMultiplier = Math.min(this._timeoutMultiplier + 1, 4);
   return this._partialAppIdDataUpdate({
     timeoutMultiplier: timeoutMultiplier
   });

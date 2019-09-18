@@ -3661,6 +3661,7 @@ function AlgoliaSearchCore(applicationID, apiKey, opts) {
   this._timeoutMultiplier = 1;
 
   this.setNaiveDefaultTimeouts();
+  // @TODO Add back when we test new strategies
   // var connection = window.navigator.connection;
   // if (connection && typeof connection.rtt === 'number') {
   //   var that = this;
@@ -3758,22 +3759,11 @@ AlgoliaSearchCore.prototype.setupTimeoutTimeFromResources = function() {
 
   if (!lastAlgoliaRequest) return this.setNaiveDefaultTimeouts();
 
-  // var redirectTime = Math.round(lastAlgoliaRequest.redirectEnd - lastAlgoliaRequest.redirectStart);
-  // var dnsTime = Math.round(lastAlgoliaRequest.domainLookupEnd - lastAlgoliaRequest.domainLookupStart);
-  // var TCPTime = Math.round(lastAlgoliaRequest.connectEnd - lastAlgoliaRequest.connectStart);
-  // var TLS = Math.round(lastAlgoliaRequest.secureConnectionStart > 0 ? (lastAlgoliaRequest.connectEnd - lastAlgoliaRequest.secureConnectionStart) : 0);
-  // var responseTime = Math.round(lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.responseStart);
-  // var fetchTillResponseEnd = Math.round((lastAlgoliaRequest.fetchStart > 0) ? (lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.fetchStart) : 0);
-  // var requestStartTillResponseEnd = Math.round((lastAlgoliaRwequest.requestStart > 0) ? (lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.requestStart) : 0);
   var startToEnd = Math.round(
     lastAlgoliaRequest.startTime > 0
       ? lastAlgoliaRequest.responseEnd - lastAlgoliaRequest.startTime
       : 0
   );
-  // var decodedBodySize = lastAlgoliaRequest.decodedBodySize;
-  // var encodedBodySize = lastAlgoliaRequest.encodedBodySize;
-  // var transferSize = lastAlgoliaRequest.transferSize;
-
   this.setTimeoutsFromNetwork(startToEnd);
 };
 
@@ -3782,7 +3772,7 @@ AlgoliaSearchCore.prototype.setTimeoutsFromNetwork = function(roundTripTime) {
 
   this._timeouts = {
     connect: minValue,
-    read: minValue,
+    read: minValue * 2,
     write: 30 * roundTripTime
   };
 
@@ -4621,7 +4611,7 @@ AlgoliaSearchCore.prototype._incrementHostIndex = function(hostType) {
 };
 
 AlgoliaSearchCore.prototype._incrementTimeoutMultiplier = function() {
-  var timeoutMultiplier = Math.max(this._timeoutMultiplier + 1, 4);
+  var timeoutMultiplier = Math.min(this._timeoutMultiplier + 1, 4);
   return this._partialAppIdDataUpdate({
     timeoutMultiplier: timeoutMultiplier
   });

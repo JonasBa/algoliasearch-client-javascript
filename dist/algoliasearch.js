@@ -4524,10 +4524,12 @@ AlgoliaSearchCore.prototype.getTimeouts = function() {
 
 AlgoliaSearchCore.prototype._getAppIdData = function() {
   var data = store.get(this.applicationID);
-  if (data.timeoutMultiplier === 0) {
-    data.timeoutMultiplier = 1;
+  if (data !== null) {
+    if (data.timeoutMultiplier === 0) {
+      data.timeoutMultiplier = 1;
+    }
+    this._cacheAppIdData(data);
   }
-  if (data !== null) this._cacheAppIdData(data);
   return data;
 };
 
@@ -4540,13 +4542,16 @@ AlgoliaSearchCore.prototype._setAppIdData = function(data) {
 AlgoliaSearchCore.prototype._checkAppIdData = function() {
   var data = this._getAppIdData();
   var now = new Date().getTime();
-  if (data.timeoutMultiplier > 4) {
-    data.timeoutMultiplier = 4;
-  }
 
-  if (data.timeoutMultiplier === 0) {
-    data.timeoutMultiplier = 1;
-    return this._resetInitialAppIdData(data);
+  if (data !== null) {
+    if (data.timeoutMultiplier > 4) {
+      data.timeoutMultiplier = 4;
+    }
+
+    if (data.timeoutMultiplier === 0) {
+      data.timeoutMultiplier = 1;
+      return this._resetInitialAppIdData(data);
+    }
   }
 
   if (data === null || now - data.lastChange > RESET_APP_DATA_TIMER) {
